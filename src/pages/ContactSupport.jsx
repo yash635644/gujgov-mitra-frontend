@@ -11,16 +11,37 @@ export default function ContactSupport() {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
         if (!name.trim() || !email.trim() || !message.trim()) return;
 
         setIsSubmitting(true);
-        // Simulate API call delay
-        setTimeout(() => {
+        try {
+            const response = await fetch('https://formspree.io/f/xlgkzwww', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    name: name,
+                    email: email,
+                    category: category,
+                    message: message
+                })
+            });
+
+            if (response.ok) {
+                setIsSubmitted(true);
+            } else {
+                alert("Failed to submit support ticket. Please try again.");
+            }
+        } catch (error) {
+            console.error('Submission error:', error);
+            alert("An error occurred. Please check your network and try again.");
+        } finally {
             setIsSubmitting(false);
-            setIsSubmitted(true);
-        }, 1500);
+        }
     };
 
     return (
@@ -104,6 +125,7 @@ export default function ContactSupport() {
                                     <input
                                         required
                                         type="text"
+                                        name="name"
                                         value={name}
                                         onChange={(e) => setName(e.target.value)}
                                         className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm transition-all"
@@ -116,6 +138,7 @@ export default function ContactSupport() {
                                     <input
                                         required
                                         type="email"
+                                        name="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm transition-all"
@@ -126,6 +149,7 @@ export default function ContactSupport() {
                                 <div>
                                     <label className="block text-sm font-medium text-slate-700 mb-1">Query Category</label>
                                     <select
+                                        name="category"
                                         value={category}
                                         onChange={(e) => setCategory(e.target.value)}
                                         className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm transition-all"
@@ -142,6 +166,7 @@ export default function ContactSupport() {
                                     <textarea
                                         required
                                         rows={5}
+                                        name="message"
                                         value={message}
                                         onChange={(e) => setMessage(e.target.value)}
                                         className="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:outline-none focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 text-sm transition-all resize-none"
